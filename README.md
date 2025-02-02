@@ -13,15 +13,15 @@ AI-Assisted Development: With the support of DeepSeek's intelligence, I rapidly 
 ### 功能亮点 Key Features:
 
 - 可视化页面：支持视频的剪切和合并操作。
-Visual Interface: Supports video cutting and merging.
+**Visual Interface**: Supports video cutting and merging.
 
 - 命令行支持：提供更灵活的操作方式。
-Command-Line Support: Provides a more flexible operation mode.
+**Command-Line Support**: Provides a more flexible operation mode.
 
 ### 体验与思考 Experience and Reflection
-这次开发经历让我深刻感受到 AI 对开发效率的提升。AI 不仅降低了技术门槛，还预示着一个趋势：*未来，低层次的开发工作可能会被 AI 取代，而优秀的产品经理和市场营销人员将变得更加重要*。
+这次开发经历让我深刻感受到 AI 对开发效率的提升。AI 不仅降低了技术门槛，还预示着一个趋势：**未来，低层次的开发工作可能会被 AI 取代，而优秀的产品经理和市场营销人员将变得更加重要**。
 
-This development experience gave me a deep appreciation for how AI enhances productivity. AI not only lowers technical barriers but also signals a trend: in the future, low-level development tasks may be replaced by AI, while excellent product managers and marketing professionals will become increasingly important.
+This development experience gave me a deep appreciation for how AI enhances productivity. AI not only lowers technical barriers but also signals a trend: **in the future, low-level development tasks may be replaced by AI, while excellent product managers and marketing professionals will become increasingly important.**
 
 ## 项目简介 Project Overview
 这是一个基于Go语言的视频剪辑工具，支持剪切、合并和转换视频文件。旨在简化视频处理流程，使用户能够轻松操作视频。
@@ -38,11 +38,11 @@ This is a video cutting tool based on Go language that supports cutting, merging
 1. 安装Go环境 Install Go environment
 2. 克隆项目 Clone the project
    ```bash
-   git clone https://github.com/yourusername/videoclipper.git
+   git clone https://github.com/hengyumo/video_clip.git
    ```
 3. 进入项目目录 Navigate to the project directory
    ```bash
-   cd videoclipper
+   cd video_clip
    ```
 4. 运行项目 Run the project
    ```bash
