@@ -35,7 +35,9 @@ This is a video cutting tool based on Go language that supports cutting, merging
 - 查看任务进度 View Task Progress 
 
 ## 安装和运行说明 Installation and Usage
-1. 安装Go环境 Install Go environment
+1. 安装 ffmpeg Install ffmpeg 
+   https://www.ffmpeg.org/download.html
+2. 安装Go环境 Install Go environment
 2. 克隆项目 Clone the project
    ```bash
    git clone https://github.com/hengyumo/video_clip.git
