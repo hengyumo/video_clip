@@ -2,18 +2,18 @@ package config
 
 import (
 	"github.com/spf13/viper"
-	"path/filepath" 
+	"path/filepath"
 )
 
 type Config struct {
-	VideoDir      string 
+	VideoDir string
 }
 
 var AppConfig Config
 
 func LoadConfig() (*Config, error) {
 	cfg := &Config{}
-	
+
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
@@ -23,7 +23,7 @@ func LoadConfig() (*Config, error) {
 		return nil, err
 	}
 
-	cfg.VideoDir = viper.GetString("video_dir") 
+	cfg.VideoDir = viper.GetString("video_dir")
 
 	// 确保视频目录路径是绝对路径
 	if !filepath.IsAbs(cfg.VideoDir) {
@@ -32,7 +32,7 @@ func LoadConfig() (*Config, error) {
 			return nil, err
 		}
 		cfg.VideoDir = absPath
-	} 
+	}
 
 	return cfg, nil
-} 
+}
