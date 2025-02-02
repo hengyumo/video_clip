@@ -1,0 +1,26 @@
+# Build and binary files
+*.out
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Vendor directory
+vendor/
+
+# IDE files
+.vscode/
+.idea/
+
+# Dependency directories
+node_modules/
+dist/
+build/
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
