@@ -35,7 +35,7 @@ This is a video cutting tool based on Go language that supports cutting, merging
 - 查看任务进度 View Task Progress 
 
 ## 安装和运行说明 Installation and Usage
-1. 安装 ffmpeg Install ffmpeg 
+1. 安装 ffmpeg Install ffmpeg  
    https://www.ffmpeg.org/download.html
 2. 安装Go环境 Install Go environment
 2. 克隆项目 Clone the project
@@ -51,7 +51,7 @@ This is a video cutting tool based on Go language that supports cutting, merging
    go run cmd/clipper/main.go web
    ``` 
 5. 访问页面 
-   http://127.0.0.1:808/static/
+   http://127.0.0.1:8080/static/
 
 ## Web页面功能 Web Interface Features
 
