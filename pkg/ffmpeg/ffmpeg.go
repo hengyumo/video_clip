@@ -26,7 +26,7 @@ type TaskInfo struct {
 	InputFiles   []string
 	OutputFile   string
 	TaskType     string // cut, merge, convert
-    Description  string
+	Description  string
 }
 
 var (
@@ -97,39 +97,39 @@ func (v *VideoProcessor) Cut(input, output, start, end string, taskID int64) err
 
 	if err := cmd.Start(); err != nil {
 		return fmt.Errorf("ffmpeg启动失败: %v", err)
-	} 
- 
-	startTime := parseDuration(start) 
-	endTime := parseDuration(end) 
+	}
+
+	startTime := parseDuration(start)
+	endTime := parseDuration(end)
 	totalDuration := endTime - startTime
 	fileName := filepath.Base(input)
-    taskInfo := &TaskInfo{
-        TaskID:      taskID,
-        TaskType:    "cut",
-        StartTime:   time.Now(),
-        Status:      "running",
-        InputFiles:  []string{input},
-        OutputFile:  output,
-        Description: fmt.Sprintf("剪切 %s 从 %v 到 %v", fileName, start, end),
-    }
+	taskInfo := &TaskInfo{
+		TaskID:      taskID,
+		TaskType:    "cut",
+		StartTime:   time.Now(),
+		Status:      "running",
+		InputFiles:  []string{input},
+		OutputFile:  output,
+		Description: fmt.Sprintf("剪切 %s 从 %v 到 %v", fileName, start, end),
+	}
 	taskProgressMap.Store(taskID, taskInfo)
-   
+
 	// 解析进度
 	go parseCmdProgress(taskID, totalDuration, stderr)
 
 	if err := cmd.Wait(); err != nil {
 		taskInfo.Status = "failed"
-        return fmt.Errorf("ffmpeg执行失败: %v", err)
+		return fmt.Errorf("ffmpeg执行失败: %v", err)
 	}
 
-    taskInfo.Status = "completed"
+	taskInfo.Status = "completed"
 	return nil
 }
 
 // GetVideoDuration 获取视频时长（秒）
 func (v *VideoProcessor) GetVideoDuration(input string) (int64, error) {
 	cmd := exec.Command(v.ffmpegPath, "-i", input)
-	output, _ := cmd.CombinedOutput() 
+	output, _ := cmd.CombinedOutput()
 
 	// 查找持续时间信息
 	outputStr := string(output)
@@ -156,7 +156,7 @@ func (v *VideoProcessor) Merge(inputs []string, output string, taskID int64) err
 			return fmt.Errorf("获取视频%s时长失败: %v", input, err)
 		}
 		totalDuration += duration
-	} 
+	}
 	// 生成文件列表
 	listFile := "concat.txt"
 	content := ""
@@ -179,83 +179,82 @@ func (v *VideoProcessor) Merge(inputs []string, output string, taskID int64) err
 		"-i", listFile,
 		"-c", "copy",
 		output,
-	) 
+	)
 	taskInfo := &TaskInfo{
-        TaskID:      taskID,
-        TaskType:    "merge",
-        StartTime:   time.Now(),
-        Status:      "running",
-        InputFiles:  inputs,
-        OutputFile:  output,
-        Description: fmt.Sprintf("合并视频: %v", fileNames),
-    }
-    taskProgressMap.Store(taskID, taskInfo)
+		TaskID:      taskID,
+		TaskType:    "merge",
+		StartTime:   time.Now(),
+		Status:      "running",
+		InputFiles:  inputs,
+		OutputFile:  output,
+		Description: fmt.Sprintf("合并视频: %v", fileNames),
+	}
+	taskProgressMap.Store(taskID, taskInfo)
 
 	// 获取标准错误输出
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
 		taskInfo.Status = "failed"
-        return fmt.Errorf("无法获取stderr管道: %v", err)
+		return fmt.Errorf("无法获取stderr管道: %v", err)
 	}
 
 	if err := cmd.Start(); err != nil {
 		taskInfo.Status = "failed"
-        return fmt.Errorf("ffmpeg启动失败: %v", err)
-	} 
+		return fmt.Errorf("ffmpeg启动失败: %v", err)
+	}
 
 	// 解析进度
 	go parseCmdProgress(taskID, totalDuration, stderr)
 
 	if err := cmd.Wait(); err != nil {
 		taskInfo.Status = "failed"
-        return fmt.Errorf("ffmpeg执行失败: %v", err)
+		return fmt.Errorf("ffmpeg执行失败: %v", err)
 	}
 
-    taskInfo.Status = "completed"
+	taskInfo.Status = "completed"
 	return nil
 }
 
 func parseCmdProgress2(taskID, totalSeconds int64, stderr io.ReadCloser) {
 	defer stderr.Close()
 
-    scanner := bufio.NewScanner(stderr)
-    re := regexp.MustCompile(`time=(\d+):(\d+):(\d+.\d+)`)
+	scanner := bufio.NewScanner(stderr)
+	re := regexp.MustCompile(`time=(\d+):(\d+):(\d+.\d+)`)
 
-    for scanner.Scan() {
-        line := scanner.Text()
-		fmt.Println("line: ", line) 
-        matches := re.FindStringSubmatch(line)
-        if len(matches) == 4 {
-            hours, _ := strconv.Atoi(matches[1])
-            minutes, _ := strconv.Atoi(matches[2])
-            seconds, _ := strconv.ParseFloat(matches[3], 64)
-            currentSeconds := int64(hours*3600 + minutes*60) + int64(seconds)
+	for scanner.Scan() {
+		line := scanner.Text()
+		fmt.Println("line: ", line)
+		matches := re.FindStringSubmatch(line)
+		if len(matches) == 4 {
+			hours, _ := strconv.Atoi(matches[1])
+			minutes, _ := strconv.Atoi(matches[2])
+			seconds, _ := strconv.ParseFloat(matches[3], 64)
+			currentSeconds := int64(hours*3600+minutes*60) + int64(seconds)
 
-            if value, ok := taskProgressMap.Load(taskID); ok {
-                taskInfo := value.(*TaskInfo)
+			if value, ok := taskProgressMap.Load(taskID); ok {
+				taskInfo := value.(*TaskInfo)
 				progress := int((float64(currentSeconds) / float64(totalSeconds)) * 100)
 				if progress < taskInfo.Progress {
 					progress = taskInfo.Progress
 				}
 				fmt.Println("task: ", taskID, ", progress: ", progress)
-                taskInfo.Progress = progress
-                taskProgressMap.Store(taskID, taskInfo)
-            }
-        } else { 
-            if value, ok := taskProgressMap.Load(taskID); ok {
-                taskInfo := value.(*TaskInfo)  
+				taskInfo.Progress = progress
+				taskProgressMap.Store(taskID, taskInfo)
+			}
+		} else {
+			if value, ok := taskProgressMap.Load(taskID); ok {
+				taskInfo := value.(*TaskInfo)
 				if taskInfo.Progress < 60 {
-					taskInfo.Progress ++
+					taskInfo.Progress++
 				}
-                taskProgressMap.Store(taskID, taskInfo)
-            }
+				taskProgressMap.Store(taskID, taskInfo)
+			}
 		}
-    }
-    if err := scanner.Err(); err != nil {
-        log.Printf("解析进度时出错: %v", err)
-    } 
+	}
+	if err := scanner.Err(); err != nil {
+		log.Printf("解析进度时出错: %v", err)
+	}
 }
-
 
 func parseCmdProgress(taskID, totalDuration int64, stderr io.ReadCloser) {
 	buf := make([]byte, 1024)
@@ -269,19 +268,19 @@ func parseCmdProgress(taskID, totalDuration int64, stderr io.ReadCloser) {
 		output := string(buf[:n])
 		fmt.Println(output)
 		progress := parseProgress(strbuf.String(), totalDuration)
-		
+
 		if value, ok := taskProgressMap.Load(taskID); ok {
-			taskInfo := value.(*TaskInfo)  
+			taskInfo := value.(*TaskInfo)
 			fmt.Println("task: ", taskID, ", progress: ", progress)
 			if progress != -1 && progress > taskInfo.Progress {
 				taskInfo.Progress = progress
 			} else if taskInfo.Progress < 20 {
-				taskInfo.Progress ++ 
+				taskInfo.Progress++
 			}
 			taskProgressMap.Store(taskID, taskInfo)
 		}
 	}
-	if value, ok := taskProgressMap.Load(taskID); ok { 
+	if value, ok := taskProgressMap.Load(taskID); ok {
 		taskInfo := value.(*TaskInfo)
 		taskInfo.Progress = 100
 		taskProgressMap.Store(taskID, taskInfo)
@@ -298,7 +297,7 @@ func parseProgress(output string, totalDuration int64) int {
 
 	// 解析当前时间
 	timeStr := output[timeIndex+5 : timeIndex+16]
-	currentTime := parseDuration(timeStr) 
+	currentTime := parseDuration(timeStr)
 
 	// 计算进度百分比
 	if totalDuration == 0 {
@@ -353,12 +352,12 @@ func (v *VideoProcessor) Convert(input, output string, taskID int64) error {
 
 	// 创建任务信息
 	taskInfo := &TaskInfo{
-		TaskID:     taskID,
-		StartTime:  time.Now(),
-		Status:     "running",
-		InputFiles: []string{input},
-		OutputFile: output,
-		TaskType:   "convert",
+		TaskID:      taskID,
+		StartTime:   time.Now(),
+		Status:      "running",
+		InputFiles:  []string{input},
+		OutputFile:  output,
+		TaskType:    "convert",
 		Description: fmt.Sprintf("转换视频 %s 为 %s", input, output),
 	}
 	taskProgressMap.Store(taskID, taskInfo)
@@ -378,7 +377,7 @@ func (v *VideoProcessor) Convert(input, output string, taskID int64) error {
 
 	taskInfo.Status = "completed"
 	return nil
-} 
+}
 
 // GetAllTasks 获取所有任务信息
 func (v *VideoProcessor) GetAllTasks() []*TaskInfo {

@@ -42,7 +42,7 @@ func startWebServer() {
 	webCmd := flag.NewFlagSet("web", flag.ExitOnError)
 	port := webCmd.String("p", "", "端口")
 	webCmd.Parse(os.Args[2:])
-	
+
 	cfg, err := config.LoadConfig()
 	if err != nil {
 		log.Fatalf("Failed to load config: %v", err)
@@ -202,9 +202,9 @@ func handleConvertDirCommand() {
 	for _, file := range toConvert {
 		inputPath := filepath.Join(*dir, file)
 		outputPath := filepath.Join(*dir, file[:len(file)-len(filepath.Ext(file))]+".mp4")
-		
+
 		fmt.Printf("正在转换: %s -> %s\n", file, outputPath)
-		err := processor.Convert(inputPath, outputPath, currentTaskID.Add(1))	
+		err := processor.Convert(inputPath, outputPath, currentTaskID.Add(1))
 		if err != nil {
 			fmt.Printf("转换失败: %s (%v)\n", file, err)
 			continue

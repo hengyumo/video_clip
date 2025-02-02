@@ -7,9 +7,9 @@ import (
 )
 
 type Server struct {
-	videoDir string
+	videoDir  string
 	processor *ffmpeg.VideoProcessor
-	router *gin.Engine
+	router    *gin.Engine
 }
 
 func NewServer(videoDir string) (*Server, error) {
@@ -19,17 +19,17 @@ func NewServer(videoDir string) (*Server, error) {
 	}
 
 	router := gin.Default()
-	
+
 	return &Server{
-		videoDir: videoDir,
+		videoDir:  videoDir,
 		processor: processor,
-		router: router,
+		router:    router,
 	}, nil
 }
 
 func (s *Server) setupRoutes() {
 	handler := NewVideoHandler(s.videoDir, s.processor)
-	
+
 	api := s.router.Group("/api")
 	{
 		videos := api.Group("/videos")
@@ -47,13 +47,13 @@ func (s *Server) setupRoutes() {
 			tasks.GET("/:taskID", handler.GetTask)
 		}
 	}
-	
+
 	// 静态文件服务
 	s.router.Static("/static", "./static")
 }
 
 func (s *Server) StartServer(port string) {
-	s.setupRoutes() 
+	s.setupRoutes()
 	if err := s.router.Run(":" + port); err != nil {
 		panic(fmt.Sprintf("failed to start server: %v", err))
 	}
