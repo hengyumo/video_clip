@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"sync/atomic"
@@ -41,18 +40,22 @@ func main() {
 func startWebServer() {
 	webCmd := flag.NewFlagSet("web", flag.ExitOnError)
 	port := webCmd.String("p", "", "端口")
+	videoDir := webCmd.String("d", "", "视频路径")
 	webCmd.Parse(os.Args[2:])
 
-	cfg, err := config.LoadConfig()
-	if err != nil {
-		log.Fatalf("Failed to load config: %v", err)
+	if *videoDir == "" {
+		cfg, err := config.LoadConfig()
+		if err == nil && cfg.VideoDir != "" {
+			videoDir = &cfg.VideoDir
+		}
 	}
+
 	const defaultPort = "8080"
 	if *port == "" {
 		*port = defaultPort
 	}
 
-	server, err := web.NewServer(cfg.VideoDir)
+	server, err := web.NewServer(*videoDir)
 	if err != nil {
 		fmt.Println("启动Web服务失败:", err)
 		return

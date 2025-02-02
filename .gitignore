@@ -5,6 +5,7 @@
 *.dll
 *.so
 *.dylib
+build
 
 # Vendor directory
 vendor/

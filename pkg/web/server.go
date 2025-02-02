@@ -1,10 +1,17 @@
 package web
 
 import (
+	"embed"
 	"fmt"
-	"github.com/gin-gonic/gin"
+	"io/fs"
+	"net/http"
 	"video-clipper/pkg/ffmpeg"
+
+	"github.com/gin-gonic/gin"
 )
+
+//go:embed static/*
+var staticFiles embed.FS
 
 type Server struct {
 	videoDir  string
@@ -49,7 +56,9 @@ func (s *Server) setupRoutes() {
 	}
 
 	// 静态文件服务
-	s.router.Static("/static", "./static")
+	// 使用嵌入的静态文件
+	staticFp, _ := fs.Sub(staticFiles, "static")
+	s.router.StaticFS("/static", http.FS(staticFp))
 }
 
 func (s *Server) StartServer(port string) {
